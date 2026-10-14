@@ -24,9 +24,5 @@ if st.button("Ask assistant", type="primary"):
             try:
                 answer = ask_agent(question.strip())
                 st.markdown(answer)
-            except Exception:
-                st.error(
-                    "The assistant encountered an error. "
-                    "Check the application logs for details."
-                )
-                st.exception("Request failed; inspect the terminal logs.")
+            except Exception as e:
+                st.error(f"Something went wrong: {e}")

@@ -8,7 +8,7 @@ st.set_page_config(
     page_icon="✈️",
 )
 
-st.title("✈️ Agentic AI Travel Assistant")
+st.title("✈️ Agentic Travel Assistant")
 st.caption("Ask about weather or country information.")
 
 question = st.text_input(

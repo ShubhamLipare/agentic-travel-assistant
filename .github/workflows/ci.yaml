@@ -1,5 +1,5 @@
 
-name: Travel Assistant CI
+name: Travel Assistant CI and Publish
 
 on:
   push:
@@ -7,8 +7,12 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  test-and-build:
+  test-and-publish:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,9 +30,27 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run automated tests
-        run: |
-          pytest -q
+        run: python -m pytest -q
 
       - name: Build Docker image
         run: |
-          docker build -t agentic-travel-assistant:ci .
+          IMAGE_NAME="ghcr.io/${GITHUB_REPOSITORY,,}"
+          echo "IMAGE_NAME=$IMAGE_NAME" >> "$GITHUB_ENV"
+          docker build \
+            -t "$IMAGE_NAME:$GITHUB_SHA" \
+            -t "$IMAGE_NAME:latest" .
+
+      - name: Log in to GHCR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | \
+            docker login ghcr.io \
+            -u "${{ github.actor }}" --password-stdin
+
+      - name: Push versioned image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker push "$IMAGE_NAME:$GITHUB_SHA"
+
+      - name: Push latest image tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: docker push "$IMAGE_NAME:latest"

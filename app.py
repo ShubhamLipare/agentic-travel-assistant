@@ -13,7 +13,7 @@ st.caption("Ask about weather or country information.")
 
 question = st.text_input(
     "What would you like to know?",
-    placeholder="What's the weather in Pune?",
+    placeholder="What's the weather in PCMC?",
 )
 
 if st.button("Ask assistant", type="primary"):
